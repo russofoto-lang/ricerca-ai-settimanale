@@ -1,0 +1,78 @@
+name: Rassegna AI settimanale
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 07:00 UTC = 08:00 in Italia in inverno, 09:00 in estate.
+    - cron: '0 7 * * 1'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rassegna-ai-settimanale
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Gemini CLI
+        run: npm install --global @google/gemini-cli@latest
+
+      - name: Configure Box MCP
+        env:
+          BOX_TOKEN: ${{ secrets.BOX_TOKEN }}
+        run: |
+          test -n "$BOX_TOKEN" || { echo 'Missing BOX_TOKEN repository secret'; exit 1; }
+          mkdir -p "$HOME/.gemini"
+          cat > "$HOME/.gemini/settings.json" <<'JSON'
+          {
+            "mcpServers": {
+              "box": {
+                "httpUrl": "https://mcp.box.simular.ai/mcp",
+                "headers": { "Authorization": "Bearer $BOX_TOKEN" },
+                "trust": true,
+                "timeout": 600000
+              }
+            }
+          }
+          JSON
+
+      - name: Research with Gemini using Simular Box
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          test -n "$GEMINI_API_KEY" || { echo 'Missing GEMINI_API_KEY repository secret'; exit 1; }
+          DATE="$(date -u +%Y-%m-%d)"
+          mkdir -p reports
+          {
+            printf 'DATA DI RIFERIMENTO: %s (UTC).\n\n' "$DATE"
+            cat RICERCA.md
+            printf '\nISTRUZIONE OPERATIVA: svolgi la ricerca usando esclusivamente il browser web del server MCP Simular Box configurato. Apri le fonti, verifica le date e inserisci nel report i link diretti. Non usare strumenti per modificare siti o account. Restituisci soltanto il report Markdown completo, senza commenti introduttivi.\n'
+          } > /tmp/prompt.md
+          gemini --prompt "$(cat /tmp/prompt.md)" --output-format text > "reports/${DATE}.md"
+          test -s "reports/${DATE}.md"
+          grep -q '^# Rassegna AI' "reports/${DATE}.md" || { echo 'Report format check failed'; cat "reports/${DATE}.md"; exit 1; }
+
+      - name: Commit report
+        run: |
+          DATE="$(date -u +%Y-%m-%d)"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "reports/${DATE}.md"
+          if git diff --cached --quiet; then
+            echo 'No report changes to commit.'
+          else
+            git commit -m "Rassegna AI ${DATE}"
+            git push
+          fi
