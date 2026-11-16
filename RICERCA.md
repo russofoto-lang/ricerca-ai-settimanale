@@ -46,3 +46,13 @@ Ordina per utilità concreta, costo totale e facilità di prova. Per ciascuno in
 Elenco dei link consultati, preferendo fonti ufficiali e GitHub.
 
 Non riempire le sezioni con contenuti deboli solo per completezza. Se non trovi elementi validi in una categoria, scrivi “Nessuna novità rilevante verificata questa settimana”.
+
+## Controllo qualità obbligatorio (prima di consegnare)
+- Per ogni novità, apri la fonte primaria e verifica direttamente data, versione e funzionalità. Non basarti soltanto su snippet, risultati del motore di ricerca o pagine di terzi.
+- Una release è “recente” solo se la data pubblicata dalla pagina ufficiale rientra negli ultimi 14 giorni rispetto alla data di riferimento. Se una versione è più vecchia, non presentarla come novità della settimana; al massimo segnalarla come contesto storico, chiaramente etichettato.
+- Non inventare versioni, date, prezzi, limiti, disponibilità in Italia, piani inclusi o compatibilità. Se non trovi una fonte primaria esplicita, scrivi “non verificato” oppure ometti il dato.
+- Distingui sempre tra annunciato, private beta, beta pubblica e disponibilità generale. Non descrivere una funzione annunciata per il futuro come già installabile.
+- Ogni voce deve avere almeno un link diretto alla fonte primaria (release GitHub, documentazione ufficiale o annuncio del produttore); usa fonti secondarie solo come supporto aggiuntivo.
+- Per i prezzi indica la valuta e il piano esatti solo se verificati su una pagina ufficiale aggiornata; evita stime di hosting o token senza fonte e segnala che sono variabili.
+- Prima di scrivere il report, esegui un controllo finale incrociato: versione/data contro release ufficiale, licenza contro LICENSE del repository, funzioni contro changelog/documentazione. Se due fonti discordano, privilegia quella primaria e segnala l'incertezza.
+- Non riempire le sezioni con prodotti generici solo per arrivare a tre elementi. Il Top 3 può contenere meno di tre elementi se non ci sono tre scelte davvero verificate.
